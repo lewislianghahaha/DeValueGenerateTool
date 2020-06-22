@@ -3,14 +3,14 @@
     partial class Main
     {
         /// <summary>
-        /// 必需的设计器变量。
+        /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
-        /// 清理所有正在使用的资源。
+        /// Clean up any resources being used.
         /// </summary>
-        /// <param name="disposing">如果应释放托管资源，为 true；否则为 false。</param>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -20,15 +20,14 @@
             base.Dispose(disposing);
         }
 
-        #region Windows 窗体设计器生成的代码
+        #region Windows Form Designer generated code
 
         /// <summary>
-        /// 设计器支持所需的方法 - 不要修改
-        /// 使用代码编辑器修改此方法的内容。
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.Menu = new System.Windows.Forms.MenuStrip();
             this.tmclose = new System.Windows.Forms.ToolStripMenuItem();
             this.btnimport = new System.Windows.Forms.Button();
@@ -39,10 +38,13 @@
             // Menu
             // 
             this.Menu.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.Menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tmclose});
             this.Menu.Location = new System.Drawing.Point(0, 0);
             this.Menu.Name = "Menu";
             this.Menu.Size = new System.Drawing.Size(284, 25);
             this.Menu.TabIndex = 0;
+            this.Menu.Text = "menuStrip1";
             // 
             // tmclose
             // 
@@ -52,9 +54,9 @@
             // 
             // btnimport
             // 
-            this.btnimport.Location = new System.Drawing.Point(33, 35);
+            this.btnimport.Location = new System.Drawing.Point(35, 34);
             this.btnimport.Name = "btnimport";
-            this.btnimport.Size = new System.Drawing.Size(218, 23);
+            this.btnimport.Size = new System.Drawing.Size(206, 23);
             this.btnimport.TabIndex = 1;
             this.btnimport.Text = "导入标准(样品)色数据";
             this.btnimport.UseVisualStyleBackColor = true;
@@ -62,12 +64,12 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.DarkRed;
-            this.label1.Location = new System.Drawing.Point(27, 64);
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(13, 64);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(233, 12);
+            this.label1.Size = new System.Drawing.Size(257, 12);
             this.label1.TabIndex = 2;
-            this.label1.Text = "注:请先导入标准色记录,再导入样品色记录";
+            this.label1.Text = "注:请先导入\'标准色\'数据,再导入\'样品色\'数据";
             // 
             // Main
             // 
@@ -78,7 +80,6 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnimport);
             this.Controls.Add(this.Menu);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.Menu;
             this.Name = "Main";
             this.Text = "DE值计算工具";
@@ -97,4 +98,3 @@
         private System.Windows.Forms.Label label1;
     }
 }
-
