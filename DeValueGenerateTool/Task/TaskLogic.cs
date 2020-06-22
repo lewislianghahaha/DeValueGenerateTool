@@ -10,12 +10,15 @@ namespace DeValueGenerateTool.Task
 
         #region 变量参数
         private int _taskid;
-        private string _fileAddress;       //文件地址
-        private DataTable _dt;             //获取dt(从EXCEL获取的DT)
+        private string _fileAddress;        //文件地址
+
+        private DataTable _standardColorDt; //获取‘标准色’EXCEL导入的DT
+        private DataTable _sampleColorDt;   //获取‘样品色’EXCEL导入的DT
+
         private DataTable _tempdt;         //保存运算成功的DT(导出时使用)
 
-        private DataTable _resultTable;   //返回DT
-        private bool _resultMark;        //返回是否成功标记
+        private DataTable _resultTable;    //返回DT
+        private bool _resultMark;          //返回是否成功标记
         #endregion
 
         #region Set
@@ -30,9 +33,14 @@ namespace DeValueGenerateTool.Task
         public string FileAddress { set { _fileAddress = value; } }
 
         /// <summary>
-        /// 获取dt(从EXCEL获取的DT)
+        /// 获取‘标准色’DT
         /// </summary>
-        public DataTable Data { set { _dt = value; } }
+        public DataTable StandardColorDt { set { _standardColorDt = value; } }
+
+        /// <summary>
+        /// 获取‘样品色’DT
+        /// </summary>
+        public DataTable SampleColorDt { set { _sampleColorDt = value; } }
         #endregion
 
         #region Get
@@ -46,10 +54,6 @@ namespace DeValueGenerateTool.Task
         /// </summary>
         public bool ResultMark => _resultMark;
 
-        /// <summary>
-        /// 返回运算成功的表头DT(导出时使用)
-        /// </summary>
-        public DataTable Tempdt => _tempdt;
         #endregion
 
         public void StartTask()
@@ -62,11 +66,11 @@ namespace DeValueGenerateTool.Task
                     break;
                 //运算
                 case 1:
-
+                    GenerateRecord(_standardColorDt,_sampleColorDt);
                     break;
                 //导出
                 case 2:
-
+                    ExportDtToExcel(_fileAddress, _tempdt);
                     break;
             }
         }
@@ -78,31 +82,41 @@ namespace DeValueGenerateTool.Task
         /// <param name="fileAddress"></param>
         private void OpenExcelImporttoDt(string fileAddress)
         {
-            //
+            //检测若发现_resultTable有值,即先将_resultTable清空,再进行赋值
             if (_resultTable?.Rows.Count >= 0)
             {
                 _resultTable.Rows.Clear();
                 _resultTable.Columns.Clear();
             }
-            //
+            //导入
             _resultTable = importDt.OpenExcelImporttoDt(fileAddress);
         }
 
         /// <summary>
         /// 运算
         /// </summary>
-        private void GenerateRecord()
+        /// <param name="standardColorDt">标准色DT</param>
+        /// <param name="sampleColorDt">样品色DT</param>
+        private void GenerateRecord(DataTable standardColorDt, DataTable sampleColorDt)
         {
-            
+            //检测若发现_tempdt有值,即先将_tempdt清空,再进行赋值
+            if (_tempdt?.Rows.Count >= 0)
+            {
+                _tempdt.Rows.Clear();
+                _tempdt.Columns.Clear();
+            }
+            _tempdt = generateDt.GenerateExcelSourceDt(standardColorDt, sampleColorDt);
+            _resultMark = _tempdt.Rows.Count > 0;
         }
 
         /// <summary>
         /// 导出
         /// </summary>
         /// <param name="fileAddress"></param>
-        private void ExportDtToExcel(string fileAddress)
+        /// <param name="tempdt">整理后的DT</param>
+        private void ExportDtToExcel(string fileAddress, DataTable tempdt)
         {
-            
+            _resultMark = exportDt.ExportDtToExcel(fileAddress, tempdt);
         }
     }
 }
