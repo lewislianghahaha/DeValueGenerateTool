@@ -111,11 +111,11 @@ namespace DeValueGenerateTool.UI
 
             if (id == 0)
             {
-                _standardColorDt = task.RestulTable;
+                _standardColorDt = task.RestulTable.Copy();
             }
             else
             {
-                _sampleColorDt = task.RestulTable;
+                _sampleColorDt = task.RestulTable.Copy();
             }
         }
 

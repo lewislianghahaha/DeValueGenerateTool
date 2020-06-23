@@ -11,8 +11,6 @@ namespace DeValueGenerateTool.Task
         #region 变量参数
         //角度临时表
         private DataTable _temprangedt;
-        //计算同一个配方内各角度DE相关值
-        private DataTable _tempdt;
         #endregion
 
         /// <summary>
@@ -22,7 +20,11 @@ namespace DeValueGenerateTool.Task
         /// <param name="sampleColorDt">‘样品色’DT</param>
         public DataTable GenerateExcelSourceDt(DataTable standardColorDt, DataTable sampleColorDt)
         {
-            var resultdt = new DataTable();
+            //结果DT
+            var resultdt = dbList.ExportDt();
+            //计算同一个配方内各角度DE相关值
+            var tempdt = dbList.GetTempDt();
+
             //初始化角度临时表
             OnInitializeTempRange();
 
@@ -39,15 +41,15 @@ namespace DeValueGenerateTool.Task
                     //使用‘角度’临时表循环获取'同一个内部色号'下的角度对应的L A B值
                     for (var i = 0; i < _temprangedt.Rows.Count; i++)
                     {
-                        _tempdt?.Merge(GetTempDt(standardrows,samplerows,Convert.ToString(_temprangedt.Rows[i])));
+                        tempdt?.Merge(GetTempDt(standardrows,samplerows,Convert.ToString(_temprangedt.Rows[i][0])));
                     }
                     //最后将结果插入至resultdt内(注:需使用SUM(5个角度的DE值)/5)
-                    resultdt.Merge(GenerateDeValueToDt(_tempdt));
+                    resultdt.Merge(GenerateDeValueToDt(tempdt));
                     //最后将_tempdt临时表数据清空
-                    if (_tempdt?.Rows.Count >= 0)
+                    if (tempdt?.Rows.Count >= 0)
                     {
-                        _tempdt.Rows.Clear();
-                        _tempdt.Columns.Clear();
+                        tempdt.Rows.Clear();
+                        tempdt.Columns.Clear();
                     }
                 }
             }
@@ -63,10 +65,10 @@ namespace DeValueGenerateTool.Task
                 _temprangedt.Rows.Clear();
                 _temprangedt.Columns.Clear();
             }
-            if (_tempdt?.Rows.Count >= 0)
+            if (tempdt?.Rows.Count >= 0)
             {
-                _tempdt.Rows.Clear();
-                _tempdt.Columns.Clear();
+                tempdt.Rows.Clear();
+                tempdt.Columns.Clear();
             }
             return resultdt;
         }
@@ -88,6 +90,7 @@ namespace DeValueGenerateTool.Task
             {
                 sumde += Convert.ToDouble(rows[5]);
             }
+
             //插入
             var newrow = resultdt.NewRow();
             newrow[0] = tempdt.Rows[0][0];  //内部色号
@@ -126,7 +129,7 @@ namespace DeValueGenerateTool.Task
         }
 
         /// <summary>
-        /// 
+        /// 运算并将结果集插入至tempdt内
         /// </summary>
         /// <param name="standardrows">'标准色'行记录</param>
         /// <param name="samplerows">‘样品色’行记录</param>
@@ -147,7 +150,8 @@ namespace DeValueGenerateTool.Task
                     for (var i = 0; i < samplerows.Length; i++)
                     {
                         //若判断到samplerows内包含rangeid,即继续
-                        if (Convert.ToString(samplerows[i][1]).Contains(range))
+                        //注:‘样品色’的角度值需要从第5位开始截取,再进行对比
+                        if (Convert.ToString(samplerows[i][1]).Substring(5).Contains(range))
                         {
                             for (var j = 0; j < standardrows.Length; j++)
                             {
@@ -174,6 +178,7 @@ namespace DeValueGenerateTool.Task
                         }
                     }
                 }
+                //若为false,即将空值插入
                 else
                 {
                     resultdt = InsertEmptyTempdt(Convert.ToString(samplerows[0][0]),range,resultdt);
@@ -256,7 +261,7 @@ namespace DeValueGenerateTool.Task
             var dt = new DataTable();
 
             //创建表头
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 1; i++)
             {
                 var dc = new DataColumn();
                 switch (i)
