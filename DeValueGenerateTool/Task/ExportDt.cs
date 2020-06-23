@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -42,8 +43,15 @@ namespace DeValueGenerateTool.Task
                         //设置列宽度
                         sheet.SetColumnWidth(j, (int)((20 + 0.72) * 256));
                         //创建标题
-                        row.CreateCell(j).SetCellValue("内部色号");
-                        row.CreateCell(j).SetCellValue("DE值");
+                        switch (j)
+                        {
+                            case 0:
+                                row.CreateCell(j).SetCellValue("内部色号");
+                                break;
+                            case 1:
+                                row.CreateCell(j).SetCellValue("DE值");
+                                break;
+                        }
                     }
 
                     //计算进行循环的起始行
@@ -91,7 +99,6 @@ namespace DeValueGenerateTool.Task
             {
                 result = false;
             }
-
             return result;
         }
     }
