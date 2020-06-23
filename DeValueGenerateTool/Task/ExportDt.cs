@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.IO;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace DeValueGenerateTool.Task
@@ -40,7 +42,8 @@ namespace DeValueGenerateTool.Task
                         //设置列宽度
                         sheet.SetColumnWidth(j, (int)((20 + 0.72) * 256));
                         //创建标题
-                        row.CreateCell(j).SetCellValue("制造商");
+                        row.CreateCell(j).SetCellValue("内部色号");
+                        row.CreateCell(j).SetCellValue("DE值");
                     }
 
                     //计算进行循环的起始行
@@ -48,8 +51,41 @@ namespace DeValueGenerateTool.Task
                     //计算进行循环的结束行
                     var endrow = i == sheetcount ? sourcedt.Rows.Count : i * 1000000;
 
-
+                    //每一个sheet表显示100000行  
+                    for (var j = startrow; j < endrow; j++)
+                    {
+                        //创建行
+                        row = sheet.CreateRow(rownum);
+                        //循环获取DT内的列值记录
+                        for (var k = 0; k < sourcedt.Columns.Count; k++)
+                        {
+                            if (Convert.ToString(sourcedt.Rows[j][k]) == "") continue;
+                            else
+                            {
+                                //若读取DE值时
+                                if (k == 1)
+                                {
+                                    row.CreateCell(k, CellType.Numeric).SetCellValue(Convert.ToDouble(sourcedt.Rows[j][k]));
+                                }
+                                //其它情况执行此
+                                else
+                                {
+                                    row.CreateCell(k, CellType.String).SetCellValue(Convert.ToString(sourcedt.Rows[j][k]));
+                                }
+                            }
+                        }
+                        rownum++;
+                    }
+                    //当一个SHEET页填充完毕后,需将变量初始化
+                    rownum = 1;
                 }
+
+                //写入数据
+                var file = new FileStream(fileAdd, FileMode.Create);
+                xssfWorkbook.Write(file);
+                file.Close();           //关闭文件流
+                xssfWorkbook.Close();   //关闭工作簿
+                file.Dispose();         //释放文件流
             }
             catch (Exception)
             {
