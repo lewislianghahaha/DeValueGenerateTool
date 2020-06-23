@@ -28,8 +28,8 @@ namespace DeValueGenerateTool.UI
 
         private void OnRegisterEvents()
         {
-            tmclose.Click += Tmclose_Click;
             btnimport.Click += Btnimport_Click;
+            this.FormClosing += Main_FormClosing;
         }
 
         private void OnInitial()
@@ -182,20 +182,35 @@ namespace DeValueGenerateTool.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Tmclose_Click(object sender, EventArgs e)
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //退出前将_standardColorDt,_sampleColorDt表清空
-            if (_standardColorDt?.Rows.Count >= 0)
+            var clickMessage = $"是否退出?";
+            if (e.CloseReason != CloseReason.ApplicationExitCall)
             {
-                _standardColorDt.Rows.Clear();
-                _standardColorDt.Columns.Clear();
+                var result = MessageBox.Show(clickMessage, $"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                //当点击"OK"按钮时执行以下操作
+                if (result == DialogResult.Yes)
+                {
+                    //退出前将_standardColorDt,_sampleColorDt表清空
+                    if (_standardColorDt?.Rows.Count >= 0)
+                    {
+                        _standardColorDt.Rows.Clear();
+                        _standardColorDt.Columns.Clear();
+                    }
+                    if (_sampleColorDt?.Rows.Count >= 0)
+                    {
+                        _sampleColorDt.Rows.Clear();
+                        _sampleColorDt.Columns.Clear();
+                    }
+                    //允许窗体关闭
+                    e.Cancel = false;
+                }
+                else
+                {
+                    //将Cancel属性设置为 true 可以"阻止"窗体关闭
+                    e.Cancel = true;
+                }
             }
-            if (_sampleColorDt?.Rows.Count >= 0)
-            {
-                _sampleColorDt.Rows.Clear();
-                _sampleColorDt.Columns.Clear();
-            }
-            this.Close();
         }
 
         /// <summary>
