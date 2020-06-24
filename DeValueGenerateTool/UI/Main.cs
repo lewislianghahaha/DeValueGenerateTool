@@ -64,13 +64,13 @@ namespace DeValueGenerateTool.UI
                 //检测若_standardColorDt及_sampleColorDt有值,即在初始化时清空这两个临时表
                 OnInitial();
 
-                GetAddAndImportDt(0);
-
+                if(!GetAddAndImportDt(0)) throw new Exception("没有导入‘标准色’模板数据,请重新导入");
                 if (_standardColorDt.Rows.Count == 0) throw new Exception("不能成功导入'标准色'EXCEL内容,请检查模板内数据是否正确.");
                 else
                 {
                     MessageBox.Show(mess_Sample, $"提示",MessageBoxButtons.OK,MessageBoxIcon.Information);
-                    GetAddAndImportDt(1);
+
+                    if(!GetAddAndImportDt(1)) throw new Exception("没有导入‘样品色’模板数据,请重新导入");
                     if(_sampleColorDt.Rows.Count == 0) throw new Exception("不能成功导入'样品色'EXCEL内容,请检查模板内数据是否正确.");
                     else
                     {
@@ -94,29 +94,37 @@ namespace DeValueGenerateTool.UI
         /// 获取导入地址及导入
         /// </summary>
         /// <param name="id">0:导入‘标准色’模板 1:导入‘样品色’模板</param>
-        private void GetAddAndImportDt(int id)
+        private bool GetAddAndImportDt(int id)
         {
+            //定义是否进行导入的标记
+            var result = false;
+
             var openFileDialog = new OpenFileDialog { Filter = $"Xlsx文件|*.xlsx" };
-            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
-            var fileAdd = openFileDialog.FileName;
-
-            //将所需的值赋到Task类内
-            task.TaskId = 0;
-            task.FileAddress = fileAdd;
-
-            //使用子线程工作(作用:通过调用子线程进行控制Load窗体的关闭情况)
-            new Thread(Start).Start();
-            load.StartPosition = FormStartPosition.CenterScreen;
-            load.ShowDialog();
-
-            if (id == 0)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                _standardColorDt = task.RestulTable.Copy();
+                var fileAdd = openFileDialog.FileName;
+
+                //将所需的值赋到Task类内
+                task.TaskId = 0;
+                task.FileAddress = fileAdd;
+
+                //使用子线程工作(作用:通过调用子线程进行控制Load窗体的关闭情况)
+                new Thread(Start).Start();
+                load.StartPosition = FormStartPosition.CenterScreen;
+                load.ShowDialog();
+
+                if (id == 0)
+                {
+                    _standardColorDt = task.RestulTable.Copy();
+                    result = true;
+                }
+                else
+                {
+                    _sampleColorDt = task.RestulTable.Copy();
+                    result = true;
+                }
             }
-            else
-            {
-                _sampleColorDt = task.RestulTable.Copy();
-            }
+            return result;
         }
 
         /// <summary>
@@ -154,21 +162,23 @@ namespace DeValueGenerateTool.UI
             try
             {
                 var saveFileDialog = new SaveFileDialog { Filter = $"Xlsx文件|*.xlsx" };
-                if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
-                var fileAdd = saveFileDialog.FileName;
-
-                task.TaskId = 2;
-                task.FileAddress = fileAdd;
-
-                //使用子线程工作(作用:通过调用子线程进行控制Load窗体的关闭情况)
-                new Thread(Start).Start();
-                load.StartPosition = FormStartPosition.CenterScreen;
-                load.ShowDialog();
-
-                if (!task.ResultMark) throw new Exception("导出异常");
-                else
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show($"导出成功!可从EXCEL中查阅导出效果", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var fileAdd = saveFileDialog.FileName;
+
+                    task.TaskId = 2;
+                    task.FileAddress = fileAdd;
+
+                    //使用子线程工作(作用:通过调用子线程进行控制Load窗体的关闭情况)
+                    new Thread(Start).Start();
+                    load.StartPosition = FormStartPosition.CenterScreen;
+                    load.ShowDialog();
+
+                    if (!task.ResultMark) throw new Exception("导出异常");
+                    else
+                    {
+                        MessageBox.Show($"导出成功!可从EXCEL中查阅导出效果", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             }
             catch (Exception ex)
