@@ -218,7 +218,7 @@ namespace DeValueGenerateTool.Task
             //检测samplerows是否有range记录
             for (var i = 0; i < samplerows.Length; i++)
             {
-                if (Convert.ToString(samplerows[i][1]).Contains(range))
+                if (Convert.ToString(samplerows[i][1]).Substring(5).Contains(range))
                 {
                     samplevalue = true;
                     break;
