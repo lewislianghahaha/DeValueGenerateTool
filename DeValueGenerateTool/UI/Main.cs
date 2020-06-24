@@ -64,13 +64,15 @@ namespace DeValueGenerateTool.UI
                 //检测若_standardColorDt及_sampleColorDt有值,即在初始化时清空这两个临时表
                 OnInitial();
 
-                if(!GetAddAndImportDt(0)) throw new Exception("没有导入‘标准色’模板数据,请重新导入");
+                if(!GetAddAndImportDt(0)) throw new Exception("没有导入'标准色'模板数据,请重新导入'标准色'数据");
+
                 if (_standardColorDt.Rows.Count == 0) throw new Exception("不能成功导入'标准色'EXCEL内容,请检查模板内数据是否正确.");
                 else
                 {
                     MessageBox.Show(mess_Sample, $"提示",MessageBoxButtons.OK,MessageBoxIcon.Information);
 
-                    if(!GetAddAndImportDt(1)) throw new Exception("没有导入‘样品色’模板数据,请重新导入");
+                    if(!GetAddAndImportDt(1)) throw new Exception("没有导入'样品色'模板数据,请重新导入'标准色'数据,再导入'样品色'数据");
+
                     if(_sampleColorDt.Rows.Count == 0) throw new Exception("不能成功导入'样品色'EXCEL内容,请检查模板内数据是否正确.");
                     else
                     {
